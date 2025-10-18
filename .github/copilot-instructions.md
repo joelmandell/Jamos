@@ -8,7 +8,9 @@ Jamos is an experimental operating system project. This is a research and develo
 
 ### Code Style and Standards
 
-- Follow operating system development best practices
+- Implement proper error handling for system calls and hardware interactions
+- Use RAII or similar patterns for resource management (memory, file descriptors, locks)
+- Follow kernel coding style guidelines where applicable
 - Maintain clear and well-documented code for complex system-level operations
 - Use descriptive variable and function names
 - Include comments for non-obvious implementation details, especially for low-level operations
@@ -35,7 +37,9 @@ Jamos is an experimental operating system project. This is a research and develo
 
 ### Building
 
-- Check for build scripts or Makefiles in the repository
+- Check for build scripts, Makefiles, or bootloader configurations in the repository
+- Consider cross-compilation settings and target architecture specifications
+- Verify toolchain requirements (assembler, linker, compiler versions)
 - Document build requirements and dependencies
 
 ### Testing
