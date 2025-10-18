@@ -18,10 +18,21 @@ SECTIONS
         *(.data .data.*)
     }
     
+    . = ALIGN(16);
+    __bss_start = .;
     .bss : {
         *(.bss .bss.*)
         *(COMMON)
     }
+    __bss_end = .;
+    
+    /* Reserve 64KB for stack */
+    . = ALIGN(16);
+    __stack_start = .;
+    .stack (NOLOAD) : {
+        . = . + 0x10000; /* 64KB stack */
+    }
+    __stack_end = .;
     
     /DISCARD/ : {
         *(.comment)

@@ -3,9 +3,10 @@ Experimental operating system written in Rust for ARM64/AArch64 architecture.
 
 ## Features
 - Bare-metal Rust kernel (no_std)
-- Targets ARM64/AArch64 architecture (macOS M1 compatible)
-- Basic bootloader that prints "Hello lovely Anna!" to UART console
-- Runs in QEMU emulator
+- Targets generic ARM64/AArch64 architecture (tested under QEMU on Apple Silicon Macs)
+- Basic bootloader with assembly boot stub for proper stack initialization
+- Prints "Hello lovely Anna!" to PL011 UART console with proper FIFO polling
+- Runs in QEMU emulator (not intended to boot directly on real M1 hardware due to proprietary boot chain)
 
 ## Prerequisites
 - Rust toolchain (rustc, cargo)

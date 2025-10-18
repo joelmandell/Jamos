@@ -20,6 +20,7 @@ echo "Press Ctrl-A then X to exit QEMU"
 echo ""
 
 # Run in QEMU with ARM64 virt machine
+# Using -kernel which properly handles raw binary and device tree placement
 qemu-system-aarch64 \
     -machine virt \
     -cpu cortex-a57 \
