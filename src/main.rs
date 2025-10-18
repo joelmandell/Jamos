@@ -3,7 +3,8 @@
 
 use core::panic::PanicInfo;
 
-// UART base address for QEMU virt machine (ARM64)
+// PL011 UART base address for QEMU virt machine (ARM64)
+// This is the standard UART0 address in QEMU's ARM virt machine
 const UART0: *mut u8 = 0x0900_0000 as *mut u8;
 
 #[no_mangle]
@@ -27,7 +28,9 @@ pub extern "C" fn _start() -> ! {
 
 #[inline(always)]
 unsafe fn uart_putc(c: u8) {
-    // Write character to UART data register
+    // Simple UART write - for this basic bootloader, we directly write to the data register
+    // In a production system, you should check the UART's FIFO status before writing
+    // by reading the UARTFR register (offset 0x18) and checking the TXFF bit
     core::ptr::write_volatile(UART0, c);
 }
 
