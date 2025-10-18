@@ -1,0 +1,22 @@
+# Rust
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# OS
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Build artifacts
+*.bin
+*.elf
+*.img
+*.iso
+
+# IDE
+.vscode/
+.idea/
+*.iml
