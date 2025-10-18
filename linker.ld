@@ -26,11 +26,11 @@ SECTIONS
     }
     __bss_end = .;
     
-    /* Reserve 64KB for stack */
+    /* Reserve 256KB for stack */
     . = ALIGN(16);
     __stack_start = .;
     .stack (NOLOAD) : {
-        . = . + 0x10000; /* 64KB stack */
+        . = . + 0x40000; /* 256KB stack */
     }
     __stack_end = .;
     
