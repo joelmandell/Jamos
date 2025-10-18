@@ -9,7 +9,7 @@ Jamos is an experimental operating system project. This is a research and develo
 ### Code Style and Standards
 
 - Implement proper error handling for system calls and hardware interactions
-- Use RAII or similar patterns for resource management (memory, file descriptors, locks)
+- Use RAII (for C++) or equivalent resource management patterns for memory, file descriptors, and locks
 - Follow kernel coding style guidelines where applicable
 - Maintain clear and well-documented code for complex system-level operations
 - Use descriptive variable and function names
