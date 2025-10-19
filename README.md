@@ -22,6 +22,11 @@ Experimental operating system written in Rust for ARM64/AArch64 architecture.
   - Basic cursor movement with arrow keys
   - Insert and delete operations
 - **Tiling Window Manager**: Micro-space tiling within virtual desktops (infrastructure ready)
+- **Wayland Compositor**: Minimal Wayland compositor with protocol support
+  - Commands: `wayland start`, `wayland stop`, `wayland status`
+  - Client connection management
+  - Surface management
+  - Global interface registry (compositor, seat, output)
 
 ## Prerequisites
 - Rust toolchain (rustc, cargo)
@@ -84,6 +89,7 @@ Once the OS boots, you'll see a command prompt. Available commands:
 - `rm <filename>` - Delete a file
 - `cat <filename>` - Display file contents
 - `edit <filename>` - Open file in text editor
+- `wayland [start|stop|status]` - Control the Wayland compositor
 
 ### Keyboard Shortcuts
 
@@ -126,6 +132,7 @@ qemu-system-aarch64 \
 - `src/terminal/` - Virtual desktop management, screen, and tiling
 - `src/filesystem/` - PostgreSQL-inspired metadata-rich filesystem
 - `src/editor/` - Simple nano-like text editor
+- `src/wayland/` - Wayland compositor implementation
 - `linker.ld` - Linker script for ARM64
 - `.cargo/config.toml` - Cargo configuration for cross-compilation
 - `bootstrap.sh` - Build and run script
@@ -149,6 +156,14 @@ The filesystem uses a PostgreSQL-inspired design with rich metadata:
 
 ### Tiling Manager
 Infrastructure is in place for micro-space tiling within virtual desktops, allowing multiple panes to be displayed side-by-side or stacked. This feature is ready for future commands to split and manage panes.
+
+### Wayland Compositor
+The Wayland compositor provides a minimal implementation of the Wayland protocol for display server functionality:
+- **Client Management**: Support for multiple client connections (up to 8 concurrent clients)
+- **Surface Management**: Creation, attachment, commit, and destruction of surfaces
+- **Global Registry**: Advertising of compositor, seat, and output interfaces
+- **Protocol Messages**: Handling of core Wayland protocol operations
+- **Manual Control**: Start and stop the compositor from the terminal with the `wayland` command
 
 ## License
 Experimental project

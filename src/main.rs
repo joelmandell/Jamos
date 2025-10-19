@@ -8,16 +8,21 @@ mod drivers;
 mod terminal;
 mod filesystem;
 mod editor;
+mod wayland;
+mod utils;
 
 use drivers::{uart::Uart, keyboard::{Keyboard, Key, KeyEvent}};
 use terminal::{VirtualDesktopManager, Screen};
 use filesystem::VirtualFileSystem;
 use editor::{TextEditor, buffer::EditorAction};
+use wayland::WaylandCompositor;
+use utils::print_number;
 
 // Global static storage for the virtual desktop manager
 static mut VDM_STORAGE: VirtualDesktopManager = VirtualDesktopManager::empty();
 static mut VFS_STORAGE: VirtualFileSystem = VirtualFileSystem::empty();
 static mut EDITOR_STORAGE: TextEditor = TextEditor::empty();
+static mut WAYLAND_STORAGE: WaylandCompositor = WaylandCompositor::empty();
 
 fn get_vdm() -> &'static mut VirtualDesktopManager {
     unsafe {
@@ -34,6 +39,12 @@ fn get_vfs() -> &'static mut VirtualFileSystem {
 fn get_editor() -> &'static mut TextEditor {
     unsafe {
         &mut EDITOR_STORAGE
+    }
+}
+
+fn get_wayland() -> &'static mut WaylandCompositor {
+    unsafe {
+        &mut WAYLAND_STORAGE
     }
 }
 
@@ -90,6 +101,9 @@ pub extern "C" fn rust_main() -> ! {
     
     // Initialize virtual filesystem
     get_vfs().init();
+    
+    // Initialize Wayland compositor
+    get_wayland().init();
     
     let mut mode = TerminalMode::Normal;
     
@@ -210,6 +224,7 @@ fn handle_normal_mode(
                     desktop.screen_mut().puts("  rm      - Delete file (usage: rm <name>)\n");
                     desktop.screen_mut().puts("  edit    - Edit file (usage: edit <name>)\n");
                     desktop.screen_mut().puts("  cat     - Display file (usage: cat <name>)\n");
+                    desktop.screen_mut().puts("  wayland - Wayland compositor (usage: wayland [start|stop|status])\n");
                 } else if input == b"clear" {
                     desktop.screen_mut().clear();
                 } else if input == b"info" {
@@ -239,6 +254,8 @@ fn handle_normal_mode(
                 } else if input.starts_with(b"cat ") {
                     let filename = &input[4..];
                     handle_cat_command(desktop.screen_mut(), filename);
+                } else if input == b"wayland" || input.starts_with(b"wayland ") {
+                    handle_wayland_command(desktop.screen_mut(), input);
                 } else if input.len() > 0 {
                     desktop.screen_mut().puts("Unknown command: ");
                     for &b in input {
@@ -333,27 +350,7 @@ fn show_prompt(screen: &mut Screen, desktop_name: &str) {
     screen.puts("]$ ");
 }
 
-fn print_number(screen: &mut Screen, n: usize) {
-    let mut buf = [0u8; 20];
-    let mut num = n;
-    let mut len = 0;
-    
-    if num == 0 {
-        buf[0] = b'0';
-        len = 1;
-    } else {
-        while num > 0 {
-            buf[len] = b'0' + (num % 10) as u8;
-            num /= 10;
-            len += 1;
-        }
-    }
-    
-    // Print in reverse
-    for i in (0..len).rev() {
-        screen.putc(buf[i]);
-    }
-}
+
 
 fn handle_ls_command(screen: &mut Screen) {
     let vfs = get_vfs();
@@ -483,6 +480,23 @@ fn handle_edit_command(screen: &mut Screen, filename: &[u8], mode: &mut Terminal
     // Render editor
     editor.render(screen);
     *mode = TerminalMode::Editor;
+}
+
+fn handle_wayland_command(screen: &mut Screen, input: &[u8]) {
+    let wayland = get_wayland();
+    
+    if input == b"wayland" || input == b"wayland status" {
+        wayland.status(screen);
+    } else if input == b"wayland start" {
+        wayland.start(screen);
+    } else if input == b"wayland stop" {
+        wayland.stop(screen);
+    } else {
+        screen.puts("Usage: wayland [start|stop|status]\n");
+        screen.puts("  start  - Start the Wayland compositor\n");
+        screen.puts("  stop   - Stop the Wayland compositor\n");
+        screen.puts("  status - Show compositor status (default)\n");
+    }
 }
 
 fn handle_editor_mode(event: &KeyEvent, mode: &mut TerminalMode) {
