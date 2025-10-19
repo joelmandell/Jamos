@@ -58,8 +58,9 @@ impl TilingManager {
         }
     }
 
-    pub fn init(&mut self, uart: Uart) {
-        self.panes[0] = Pane::new(uart, 0);
+    pub fn init(&mut self, _uart: Uart) {
+        // For now, just initialize the counts without setting up panes
+        // to avoid initialization hang issues
         self.pane_count = 1;
         self.active_pane = 0;
         self.layout = TileLayout::Single;

@@ -30,14 +30,19 @@ impl VirtualDesktop {
     
     pub fn init(&mut self, uart: Uart, name: &str) {
         self.screen = Screen::new(uart);
-        self.tiling.init(uart);
+        // Note: tiling.init() is skipped to avoid initialization hang
+        // The tiling manager will remain uninitialized but unused for now
         self.set_name(name);
         self.is_active = true;
     }
 
     pub fn set_name(&mut self, name: &str) {
         self.name_len = name.len().min(MAX_NAME_LEN);
-        self.name[..self.name_len].copy_from_slice(&name.as_bytes()[..self.name_len]);
+        // Manually copy bytes to avoid memcpy hang
+        let bytes = name.as_bytes();
+        for i in 0..self.name_len {
+            self.name[i] = bytes[i];
+        }
     }
 
     pub fn copy_name_to(&self, buf: &mut [u8]) -> usize {

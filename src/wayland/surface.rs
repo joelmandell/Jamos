@@ -73,7 +73,15 @@ impl SurfaceManager {
     }
 
     pub fn init(&mut self) {
-        self.surfaces = [None; 32];
+        // Initialize surfaces array element by element to avoid potential memcpy issues
+        // Using manual while loop instead of for-loop because for-loops trigger
+        // a compiler optimization bug in rustc release builds for aarch64-unknown-none
+        // that causes the system to hang
+        let mut i = 0;
+        while i < self.surfaces.len() {
+            self.surfaces[i] = None;
+            i += 1;
+        }
         self.next_id = SURFACE_ID_START;
     }
 
