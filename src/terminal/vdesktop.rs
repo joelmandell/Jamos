@@ -1,5 +1,6 @@
 // Virtual desktop management with tiling terminal support
 use super::screen::Screen;
+use super::tiling::TilingManager;
 use crate::drivers::uart::Uart;
 
 const MAX_NAME_LEN: usize = 16;
@@ -8,6 +9,7 @@ pub struct VirtualDesktop {
     name: [u8; MAX_NAME_LEN],
     name_len: usize,
     screen: Screen,
+    tiling: TilingManager,
     input_buffer: [u8; 32],
     input_len: usize,
     is_active: bool,
@@ -19,6 +21,7 @@ impl VirtualDesktop {
             name: [0; MAX_NAME_LEN],
             name_len: 0,
             screen: Screen::empty(),
+            tiling: TilingManager::empty(),
             input_buffer: [0; 32],
             input_len: 0,
             is_active: false,
@@ -27,6 +30,7 @@ impl VirtualDesktop {
     
     pub fn init(&mut self, uart: Uart, name: &str) {
         self.screen = Screen::new(uart);
+        self.tiling.init(uart);
         self.set_name(name);
         self.is_active = true;
     }
@@ -44,6 +48,10 @@ impl VirtualDesktop {
 
     pub fn screen_mut(&mut self) -> &mut Screen {
         &mut self.screen
+    }
+
+    pub fn tiling_mut(&mut self) -> &mut TilingManager {
+        &mut self.tiling
     }
 
     pub fn add_input(&mut self, c: u8) {

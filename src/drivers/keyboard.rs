@@ -28,7 +28,6 @@ pub struct KeyEvent {
 pub struct Keyboard {
     uart: Uart,
     meta_pressed: bool,
-    ctrl_pressed: bool,
     escape_sequence: EscapeSequence,
 }
 
@@ -37,6 +36,9 @@ enum EscapeSequence {
     None,
     Escape,
     Bracket,
+    BracketOne,     // After ESC[1
+    BracketOneColon, // After ESC[1;
+    BracketOneColonFive, // After ESC[1;5 (Ctrl modifier)
 }
 
 impl Keyboard {
@@ -44,7 +46,6 @@ impl Keyboard {
         Keyboard {
             uart,
             meta_pressed: false,
-            ctrl_pressed: false,
             escape_sequence: EscapeSequence::None,
         }
     }
@@ -53,6 +54,7 @@ impl Keyboard {
         let c = self.uart.getc()?;
 
         // Handle ANSI escape sequences for arrow keys
+        // ESC[C = Right, ESC[D = Left, ESC[1;5C = Ctrl+Right, ESC[1;5D = Ctrl+Left
         match self.escape_sequence {
             EscapeSequence::None => {
                 if c == 0x1B {  // ESC
@@ -76,6 +78,12 @@ impl Keyboard {
                 }
             }
             EscapeSequence::Bracket => {
+                // Check if this is an extended sequence (ESC[1;5C for Ctrl+Right)
+                if c == b'1' {
+                    self.escape_sequence = EscapeSequence::BracketOne;
+                    return None;
+                }
+                
                 self.escape_sequence = EscapeSequence::None;
                 let key = match c {
                     b'A' => Key::Up,
@@ -88,6 +96,45 @@ impl Keyboard {
                     key,
                     meta: self.meta_pressed,
                     ctrl: false,
+                    shift: false,
+                })
+            }
+            EscapeSequence::BracketOne => {
+                // Expecting ';' after '1'
+                if c == b';' {
+                    self.escape_sequence = EscapeSequence::BracketOneColon;
+                    return None;
+                } else {
+                    // Not a recognized extended sequence, treat as regular key
+                    self.escape_sequence = EscapeSequence::None;
+                    self.process_char(c)
+                }
+            }
+            EscapeSequence::BracketOneColon => {
+                // Expecting '5' for Ctrl modifier
+                if c == b'5' {
+                    self.escape_sequence = EscapeSequence::BracketOneColonFive;
+                    return None;
+                } else {
+                    // Not a Ctrl modifier, treat as regular key
+                    self.escape_sequence = EscapeSequence::None;
+                    self.process_char(c)
+                }
+            }
+            EscapeSequence::BracketOneColonFive => {
+                // Final character - arrow key with Ctrl
+                self.escape_sequence = EscapeSequence::None;
+                let key = match c {
+                    b'A' => Key::Up,
+                    b'B' => Key::Down,
+                    b'C' => Key::Right,
+                    b'D' => Key::Left,
+                    _ => Key::Unknown,
+                };
+                Some(KeyEvent {
+                    key,
+                    meta: self.meta_pressed,
+                    ctrl: true,  // Set ctrl flag for these keys
                     shift: false,
                 })
             }

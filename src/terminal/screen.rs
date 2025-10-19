@@ -1,6 +1,7 @@
 // Screen buffer and rendering - simplified version that writes directly to UART
 use crate::drivers::uart::Uart;
 
+#[derive(Clone, Copy)]
 pub struct Screen {
     uart: Uart,
     prompt_shown: bool,
