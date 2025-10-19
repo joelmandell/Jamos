@@ -127,7 +127,7 @@ pub extern "C" fn rust_main() -> ! {
                     handle_naming_mode(vdm, &event, &mut mode);
                 }
                 TerminalMode::Editor => {
-                    handle_editor_mode(&event, &mut mode);
+                    handle_editor_mode(vdm, &event, &mut mode);
                 }
             }
         }
@@ -499,9 +499,12 @@ fn handle_wayland_command(screen: &mut Screen, input: &[u8]) {
     }
 }
 
-fn handle_editor_mode(event: &KeyEvent, mode: &mut TerminalMode) {
+fn handle_editor_mode(
+    vdm: &mut VirtualDesktopManager,
+    event: &KeyEvent,
+    mode: &mut TerminalMode,
+) {
     let editor = get_editor();
-    let vdm = get_vdm();
     
     if let Some(desktop) = vdm.current_mut() {
         let action = editor.handle_key(event, desktop.screen_mut());
