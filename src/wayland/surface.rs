@@ -74,8 +74,10 @@ impl SurfaceManager {
 
     pub fn init(&mut self) {
         // Initialize surfaces array element by element to avoid potential memcpy issues
-        for i in 0..self.surfaces.len() {
+        let mut i = 0;
+        while i < self.surfaces.len() {
             self.surfaces[i] = None;
+            i += 1;
         }
         self.next_id = SURFACE_ID_START;
     }

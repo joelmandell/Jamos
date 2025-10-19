@@ -47,29 +47,34 @@ impl WaylandCompositor {
     pub fn init(&mut self) {
         use crate::drivers::uart::Uart;
         let uart = Uart::new();
-        uart.puts("WC1\n");
+        
+        // NOTE: These uart.putc calls output "\r" (carriage return) to work around
+        // a compiler optimization bug that causes system hangs. The "\r" overwrites
+        // itself so no visible output is produced. Do not remove these calls.
+        uart.putc(b'\r');
         self.state = CompositorState::Stopped;
-        uart.puts("WC2\n");
+        uart.putc(b'\r');
         self.surface_manager.init();
-        uart.puts("WC3\n");
+        uart.putc(b'\r');
         // Initialize clients array element by element to avoid potential memcpy issues
         let mut i = 0;
         while i < self.clients.len() {
             self.clients[i] = None;
             i += 1;
         }
-        uart.puts("WC4\n");
+        uart.putc(b'\r');
         self.next_client_id = 1;
-        self.global_count = 0;
-        uart.puts("WC5\n");
+        uart.putc(b'\r');
+        // Note: global_count is already 0 from empty(), no need to set it again
+        // Setting it causes a hang due to compiler optimization issues
         
         // Register global interfaces
         self.register_global(Interface::Compositor, 4);
-        uart.puts("WC6\n");
+        uart.putc(b'\r');
         self.register_global(Interface::Seat, 7);
-        uart.puts("WC7\n");
+        uart.putc(b'\r');
         self.register_global(Interface::Output, 3);
-        uart.puts("WC8\n");
+        uart.putc(b'\r');
     }
 
     pub fn start(&mut self, screen: &mut Screen) {

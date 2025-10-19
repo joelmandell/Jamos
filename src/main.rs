@@ -104,27 +104,16 @@ pub extern "C" fn rust_main() -> ! {
     
     // Initialize Wayland compositor
     get_wayland().init();
-    uart.puts("After Wayland init\n");
     
     let mut mode = TerminalMode::Normal;
-    uart.puts("After mode init\n");
     
     // Show prompt
-    uart.puts("A\n");
     {
         let vdm = get_vdm();
-        uart.puts("B\n");
         if let Some(desktop) = vdm.current_mut() {
-            uart.puts("C\n");
             desktop.screen_mut().puts("[Desktop 1]$ ");
-            uart.puts("D\n");
-        } else {
-            // Fallback if desktop not initialized
-            uart.puts("E\n");
-            uart.puts("[Desktop 1]$ ");
         }
     }
-    uart.puts("F\n");
     
     // Main terminal loop
     loop {
