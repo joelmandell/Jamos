@@ -8,6 +8,7 @@ const UART0_FR: *mut u32 = (UART0_BASE + 0x18) as *mut u32; // Flag register
 const UART_FR_TXFF: u32 = 1 << 5; // Transmit FIFO full
 const UART_FR_RXFE: u32 = 1 << 4; // Receive FIFO empty
 
+#[derive(Clone, Copy)]
 pub struct Uart;
 
 impl Uart {
