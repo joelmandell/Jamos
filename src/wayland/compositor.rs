@@ -1,9 +1,10 @@
 // Wayland compositor implementation
 
-use super::protocol::{GlobalEntry, Interface, Message, MessageType, ObjectId};
+use super::protocol::{GlobalEntry, Interface, Message, MessageType};
 use super::surface::SurfaceManager;
 use super::CompositorState;
 use crate::terminal::Screen;
+use crate::utils::print_number;
 
 /// Client connection to the compositor
 #[derive(Debug, Clone, Copy)]
@@ -73,7 +74,7 @@ impl WaylandCompositor {
                 screen.puts("  - ");
                 screen.puts(global.interface.name());
                 screen.puts(" (version ");
-                self.print_number(screen, global.version as usize);
+                print_number(screen, global.version as usize);
                 screen.puts(")\n");
             }
         }
@@ -109,16 +110,16 @@ impl WaylandCompositor {
         
         screen.puts("Connected clients: ");
         let client_count = self.count_clients();
-        self.print_number(screen, client_count);
+        print_number(screen, client_count);
         screen.puts("\n");
         
         screen.puts("Active surfaces: ");
         let surface_count = self.surface_manager.count_surfaces();
-        self.print_number(screen, surface_count);
+        print_number(screen, surface_count);
         screen.puts("\n");
         
         screen.puts("Registered globals: ");
-        self.print_number(screen, self.global_count);
+        print_number(screen, self.global_count);
         screen.puts("\n");
     }
 
@@ -181,7 +182,7 @@ impl WaylandCompositor {
             MessageType::CompositorCreateSurface => {
                 if let Some(surface_id) = self.surface_manager.create_surface() {
                     screen.puts("[Wayland] Created surface ID: ");
-                    self.print_number(screen, surface_id as usize);
+                    print_number(screen, surface_id as usize);
                     screen.puts("\n");
                 }
             }
@@ -205,26 +206,4 @@ impl WaylandCompositor {
         }
     }
 
-    // Helper to print numbers
-    fn print_number(&self, screen: &mut Screen, n: usize) {
-        let mut buf = [0u8; 20];
-        let mut num = n;
-        let mut len = 0;
-        
-        if num == 0 {
-            buf[0] = b'0';
-            len = 1;
-        } else {
-            while num > 0 {
-                buf[len] = b'0' + (num % 10) as u8;
-                num /= 10;
-                len += 1;
-            }
-        }
-        
-        // Print in reverse
-        for i in (0..len).rev() {
-            screen.putc(buf[i]);
-        }
-    }
 }

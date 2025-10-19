@@ -9,12 +9,14 @@ mod terminal;
 mod filesystem;
 mod editor;
 mod wayland;
+mod utils;
 
 use drivers::{uart::Uart, keyboard::{Keyboard, Key, KeyEvent}};
 use terminal::{VirtualDesktopManager, Screen};
 use filesystem::VirtualFileSystem;
 use editor::{TextEditor, buffer::EditorAction};
 use wayland::WaylandCompositor;
+use utils::print_number;
 
 // Global static storage for the virtual desktop manager
 static mut VDM_STORAGE: VirtualDesktopManager = VirtualDesktopManager::empty();
@@ -348,27 +350,7 @@ fn show_prompt(screen: &mut Screen, desktop_name: &str) {
     screen.puts("]$ ");
 }
 
-fn print_number(screen: &mut Screen, n: usize) {
-    let mut buf = [0u8; 20];
-    let mut num = n;
-    let mut len = 0;
-    
-    if num == 0 {
-        buf[0] = b'0';
-        len = 1;
-    } else {
-        while num > 0 {
-            buf[len] = b'0' + (num % 10) as u8;
-            num /= 10;
-            len += 1;
-        }
-    }
-    
-    // Print in reverse
-    for i in (0..len).rev() {
-        screen.putc(buf[i]);
-    }
-}
+
 
 fn handle_ls_command(screen: &mut Screen) {
     let vfs = get_vfs();

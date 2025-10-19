@@ -2,6 +2,13 @@
 
 use super::protocol::ObjectId;
 
+/// Default surface dimensions
+const DEFAULT_SURFACE_WIDTH: u32 = 800;
+const DEFAULT_SURFACE_HEIGHT: u32 = 600;
+
+/// Starting ID for surface objects
+const SURFACE_ID_START: ObjectId = 1000;
+
 /// Wayland surface - represents a rectangular area that can be rendered
 #[derive(Debug, Clone, Copy)]
 pub struct Surface {
@@ -20,8 +27,8 @@ impl Surface {
             id,
             x: 0,
             y: 0,
-            width: 800,
-            height: 600,
+            width: DEFAULT_SURFACE_WIDTH,
+            height: DEFAULT_SURFACE_HEIGHT,
             visible: false,
             buffer_attached: false,
         }
@@ -61,13 +68,13 @@ impl SurfaceManager {
     pub const fn empty() -> Self {
         Self {
             surfaces: [None; 32],
-            next_id: 1000, // Start surface IDs at 1000
+            next_id: SURFACE_ID_START,
         }
     }
 
     pub fn init(&mut self) {
         self.surfaces = [None; 32];
-        self.next_id = 1000;
+        self.next_id = SURFACE_ID_START;
     }
 
     pub fn create_surface(&mut self) -> Option<ObjectId> {
