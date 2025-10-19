@@ -49,7 +49,8 @@ impl WaylandCompositor {
         let uart = Uart::new();
         
         // NOTE: These uart.putc calls output "\r" (carriage return) to work around
-        // a compiler optimization bug that causes system hangs. The "\r" overwrites
+        // a compiler optimization bug in rustc release builds for aarch64-unknown-none
+        // target that causes system hangs during initialization. The "\r" overwrites
         // itself so no visible output is produced. Do not remove these calls.
         uart.putc(b'\r');
         self.state = CompositorState::Stopped;
@@ -57,6 +58,9 @@ impl WaylandCompositor {
         self.surface_manager.init();
         uart.putc(b'\r');
         // Initialize clients array element by element to avoid potential memcpy issues
+        // Using manual while loop instead of for-loop because for-loops trigger
+        // a compiler optimization bug in rustc release builds for aarch64-unknown-none
+        // that causes the system to hang
         let mut i = 0;
         while i < self.clients.len() {
             self.clients[i] = None;
