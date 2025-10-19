@@ -117,8 +117,8 @@ pub extern "C" fn rust_main() -> ! {
     
     // Main terminal loop
     loop {
-        let vdm = get_vdm();
         if let Some(event) = keyboard.poll() {
+            let vdm = get_vdm();
             match mode {
                 TerminalMode::Normal => {
                     handle_normal_mode(vdm, &event, &mut mode);
