@@ -28,7 +28,6 @@ pub struct KeyEvent {
 pub struct Keyboard {
     uart: Uart,
     meta_pressed: bool,
-    ctrl_pressed: bool,
     escape_sequence: EscapeSequence,
 }
 
@@ -47,7 +46,6 @@ impl Keyboard {
         Keyboard {
             uart,
             meta_pressed: false,
-            ctrl_pressed: false,
             escape_sequence: EscapeSequence::None,
         }
     }
@@ -107,8 +105,9 @@ impl Keyboard {
                     self.escape_sequence = EscapeSequence::BracketOneColon;
                     return None;
                 } else {
+                    // Not a recognized extended sequence, treat as regular key
                     self.escape_sequence = EscapeSequence::None;
-                    return None;
+                    self.process_char(c)
                 }
             }
             EscapeSequence::BracketOneColon => {
@@ -117,8 +116,9 @@ impl Keyboard {
                     self.escape_sequence = EscapeSequence::BracketOneColonFive;
                     return None;
                 } else {
+                    // Not a Ctrl modifier, treat as regular key
                     self.escape_sequence = EscapeSequence::None;
-                    return None;
+                    self.process_char(c)
                 }
             }
             EscapeSequence::BracketOneColonFive => {
