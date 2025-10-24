@@ -1,8 +1,8 @@
 # Jamos
-Experimental operating system written in Rust for ARM64/AArch64 architecture.
+Experimental operating system written in C++ for ARM64/AArch64 architecture.
 
 ## Features
-- Bare-metal Rust kernel (no_std)
+- Bare-metal C++ kernel (freestanding)
 - Targets generic ARM64/AArch64 architecture (tested under QEMU on Apple Silicon Macs)
 - Basic bootloader with assembly boot stub for proper stack initialization
 - Prints "Hello lovely Anna!" to PL011 UART console with proper FIFO polling
@@ -29,32 +29,31 @@ Experimental operating system written in Rust for ARM64/AArch64 architecture.
   - Global interface registry (compositor, seat, output)
 
 ## Prerequisites
-- Rust toolchain (rustc, cargo)
+- ARM64 bare-metal C++ toolchain (aarch64-none-elf-g++)
 - QEMU (qemu-system-aarch64)
-- cargo-binutils (for rust-objcopy)
-- llvm-tools-preview (Rust component)
+- GNU Make
 
 ## Quick Start
 
 ### Install Dependencies
 
-1. Install Rust (if not already installed):
+1. Install ARM64 bare-metal toolchain:
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# On Ubuntu/Debian
+sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+
+# Or download ARM's GNU toolchain:
+# https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
+# Look for aarch64-none-elf toolchain
+
+# On macOS
+brew install --cask gcc-aarch64-embedded
+# Or
+brew tap osx-cross/arm
+brew install arm-gcc-bin
 ```
 
-2. Add ARM64 bare-metal target:
-```bash
-rustup target add aarch64-unknown-none
-```
-
-3. Install cargo-binutils:
-```bash
-cargo install cargo-binutils
-rustup component add llvm-tools-preview
-```
-
-4. Install QEMU:
+2. Install QEMU:
 ```bash
 # On Ubuntu/Debian
 sudo apt-get install qemu-system-aarch64
@@ -71,7 +70,7 @@ Simply run the bootstrap script:
 ```
 
 This will:
-1. Build the kernel using Cargo
+1. Build the kernel using Make and the ARM64 C++ cross-compiler
 2. Convert the ELF binary to raw binary format
 3. Launch QEMU with the kernel
 
@@ -109,13 +108,7 @@ In the text editor:
 To build manually:
 ```bash
 # Build the kernel
-cargo build --release
-
-# Convert to binary
-rust-objcopy --binary-architecture=aarch64 \
-    target/aarch64-unknown-none/release/jamos \
-    -O binary \
-    target/aarch64-unknown-none/release/jamos.bin
+make all
 
 # Run in QEMU
 qemu-system-aarch64 \
@@ -124,17 +117,21 @@ qemu-system-aarch64 \
     -kernel target/aarch64-unknown-none/release/jamos.bin \
     -nographic \
     -serial mon:stdio
+
+# Clean build artifacts
+make clean
 ```
 
 ## Project Structure
-- `src/main.rs` - Main kernel code with terminal loop and command handling
-- `src/drivers/` - Hardware drivers (UART, keyboard)
-- `src/terminal/` - Virtual desktop management, screen, and tiling
-- `src/filesystem/` - PostgreSQL-inspired metadata-rich filesystem
-- `src/editor/` - Simple nano-like text editor
-- `src/wayland/` - Wayland compositor implementation
+- `cpp_src/main.cpp` - Main kernel code with terminal loop and command handling
+- `cpp_src/drivers/` - Hardware drivers (UART, keyboard)
+- `cpp_src/terminal/` - Virtual desktop management, screen, and tiling
+- `cpp_src/filesystem/` - Simplified in-memory filesystem
+- `cpp_src/editor/` - Simple nano-like text editor
+- `cpp_src/wayland/` - Wayland compositor stub
+- `include/` - Header files for all modules
 - `linker.ld` - Linker script for ARM64
-- `.cargo/config.toml` - Cargo configuration for cross-compilation
+- `Makefile` - Build configuration
 - `bootstrap.sh` - Build and run script
 
 ## Architecture
@@ -148,22 +145,19 @@ qemu-system-aarch64 \
 The system supports multiple virtual desktops, each with its own screen buffer and command history. Desktops can be created on-demand and renamed for easy identification.
 
 ### Filesystem Architecture
-The filesystem uses a PostgreSQL-inspired design with rich metadata:
-- **Inodes**: Each file/directory has an inode with metadata (size, timestamps, permissions, owner/group)
-- **File entries**: Name-to-inode mappings
-- **Data blocks**: Fixed-size blocks (512 bytes) for file content
-- **Metadata tracking**: Creation time, modification time, size, file type
+The filesystem uses a simplified in-memory design:
+- **File entries**: Fixed array of file entries with name and data
+- **Simple operations**: create, read, write, delete, list
+- **In-memory storage**: All data stored in memory (no persistence)
 
 ### Tiling Manager
 Infrastructure is in place for micro-space tiling within virtual desktops, allowing multiple panes to be displayed side-by-side or stacked. This feature is ready for future commands to split and manage panes.
 
 ### Wayland Compositor
-The Wayland compositor provides a minimal implementation of the Wayland protocol for display server functionality:
-- **Client Management**: Support for multiple client connections (up to 8 concurrent clients)
-- **Surface Management**: Creation, attachment, commit, and destruction of surfaces
-- **Global Registry**: Advertising of compositor, seat, and output interfaces
-- **Protocol Messages**: Handling of core Wayland protocol operations
-- **Manual Control**: Start and stop the compositor from the terminal with the `wayland` command
+The Wayland compositor provides a minimal stub implementation:
+- **Basic status tracking**: Start, stop, and status commands
+- **Manual control**: Start and stop the compositor from the terminal with the `wayland` command
+- **Infrastructure ready**: Can be extended with full protocol support
 
 ## License
 Experimental project
