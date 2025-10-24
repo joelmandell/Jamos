@@ -62,7 +62,7 @@ bool VirtualFileSystem::delete_file(const char* name) {
 }
 
 size_t VirtualFileSystem::read_file(int inode_id, uint8_t* buf, size_t buf_size) {
-    if (inode_id < 0 || inode_id >= MAX_FILES || !files[inode_id].in_use) {
+    if (inode_id < 0 || static_cast<size_t>(inode_id) >= MAX_FILES || !files[inode_id].in_use) {
         return 0;
     }
     
@@ -79,7 +79,7 @@ size_t VirtualFileSystem::read_file(int inode_id, uint8_t* buf, size_t buf_size)
 }
 
 bool VirtualFileSystem::write_file(int inode_id, const uint8_t* data, size_t size) {
-    if (inode_id < 0 || inode_id >= MAX_FILES || !files[inode_id].in_use) {
+    if (inode_id < 0 || static_cast<size_t>(inode_id) >= MAX_FILES || !files[inode_id].in_use) {
         return false;
     }
     

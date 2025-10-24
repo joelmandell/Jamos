@@ -307,7 +307,7 @@ void handle_editor_mode(VirtualDesktopManager* vdm, const KeyEvent& event, Termi
             }
             break;
         }
-        case EditorAction::Quit:
+        case EditorAction::Quit: {
             mode = TerminalMode::Normal;
             desktop->screen_mut()->puts("\nEditor closed.\n");
             uint8_t name_buf[32];
@@ -316,7 +316,9 @@ void handle_editor_mode(VirtualDesktopManager* vdm, const KeyEvent& event, Termi
             copy_str(name_str, name_buf, name_len, 32);
             show_prompt(desktop->screen_mut(), name_str);
             break;
+        }
         case EditorAction::Continue:
+            // Continue editing
             break;
     }
 }
@@ -482,8 +484,8 @@ extern "C" void __cxa_pure_virtual() {
 }
 
 // Operators new and delete (no-op implementations for bare metal)
-void* operator new(size_t) { return nullptr; }
-void* operator new[](size_t) { return nullptr; }
+void* operator new(size_t) noexcept { return nullptr; }
+void* operator new[](size_t) noexcept { return nullptr; }
 void operator delete(void*) noexcept {}
 void operator delete[](void*) noexcept {}
 void operator delete(void*, size_t) noexcept {}

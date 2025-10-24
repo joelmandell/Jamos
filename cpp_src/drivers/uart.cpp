@@ -2,8 +2,8 @@
 
 // PL011 UART registers
 constexpr uintptr_t UART0_BASE = 0x09000000;
-constexpr volatile uint32_t* UART0_DR = reinterpret_cast<volatile uint32_t*>(UART0_BASE);
-constexpr volatile uint32_t* UART0_FR = reinterpret_cast<volatile uint32_t*>(UART0_BASE + 0x18);
+volatile uint32_t* const UART0_DR = reinterpret_cast<volatile uint32_t*>(UART0_BASE);
+volatile uint32_t* const UART0_FR = reinterpret_cast<volatile uint32_t*>(UART0_BASE + 0x18);
 
 // UART Flag Register bits
 constexpr uint32_t UART_FR_TXFF = 1 << 5; // Transmit FIFO full

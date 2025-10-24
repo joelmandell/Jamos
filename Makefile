@@ -1,8 +1,8 @@
 # Makefile for Jamos C++ OS
 
 # Toolchain
-CXX := aarch64-none-elf-g++
-OBJCOPY := aarch64-none-elf-objcopy
+CXX := aarch64-linux-gnu-g++
+OBJCOPY := aarch64-linux-gnu-objcopy
 
 # Directories
 SRC_DIR := cpp_src
@@ -32,7 +32,7 @@ CXXFLAGS := -ffreestanding \
 LDFLAGS := -T linker.ld \
            -nostdlib \
            -nostartfiles \
-           --nmagic
+           -Wl,--nmagic
 
 # Source files
 CPP_SOURCES := $(shell find $(SRC_DIR) -name '*.cpp')

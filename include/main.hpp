@@ -22,7 +22,7 @@ extern TextEditor g_editor;
 extern WaylandCompositor g_wayland;
 
 // Boot entry point
-extern "C" void rust_main();
+extern "C" [[noreturn]] void rust_main();
 
 // Helper functions
 void show_prompt(Screen* screen, const char* desktop_name);
