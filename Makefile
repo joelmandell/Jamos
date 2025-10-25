@@ -1,8 +1,8 @@
 # Makefile for Jamos C++ OS
 
 # Toolchain
-CXX := aarch64-linux-gnu-g++
-OBJCOPY := aarch64-linux-gnu-objcopy
+CXX := clang++
+OBJCOPY := llvm-objcopy-18
 
 # Directories
 SRC_DIR := cpp_src
@@ -15,23 +15,26 @@ KERNEL_ELF := $(BUILD_DIR)/jamos.elf
 KERNEL_BIN := $(TARGET_DIR)/jamos.bin
 
 # Compiler flags
-CXXFLAGS := -ffreestanding \
+CXXFLAGS := --target=aarch64-linux-gnu \
+            -ffreestanding \
             -nostdlib \
-            -nostartfiles \
             -fno-exceptions \
             -fno-rtti \
             -fno-use-cxa-atexit \
             -Wall \
             -Wextra \
+            -Wno-new-returns-null \
+            -Wno-nonnull \
+            -Wno-unused-command-line-argument \
             -O2 \
             -I$(INC_DIR) \
             -mcpu=cortex-a57 \
             -std=c++17
 
 # Linker flags
-LDFLAGS := -T linker.ld \
+LDFLAGS := --target=aarch64-linux-gnu \
+           -T linker.ld \
            -nostdlib \
-           -nostartfiles \
            -Wl,--nmagic
 
 # Source files

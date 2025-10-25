@@ -1,5 +1,6 @@
 #include "main.hpp"
 #include "utils.hpp"
+#include <cstddef>
 
 // Global static storage
 VirtualDesktopManager g_vdm;
@@ -484,9 +485,15 @@ extern "C" void __cxa_pure_virtual() {
 }
 
 // Operators new and delete (no-op implementations for bare metal)
-void* operator new(size_t) noexcept { return nullptr; }
-void* operator new[](size_t) noexcept { return nullptr; }
+// NOTE: These intentionally return nullptr instead of allocating memory.
+// This is non-standard behavior but acceptable for our bare-metal environment where:
+// - Dynamic allocation is not used (all objects are static or stack-allocated)
+// - Exceptions are disabled (-fno-exceptions), so bad_alloc cannot be thrown
+// - Any attempt to use new will safely fail by returning nullptr
+// Declarations omit noexcept to match Clang's standard library expectations
+void* operator new(std::size_t) { return nullptr; }
+void* operator new[](std::size_t) { return nullptr; }
 void operator delete(void*) noexcept {}
 void operator delete[](void*) noexcept {}
-void operator delete(void*, size_t) noexcept {}
-void operator delete[](void*, size_t) noexcept {}
+void operator delete(void*, std::size_t) noexcept {}
+void operator delete[](void*, std::size_t) noexcept {}

@@ -29,7 +29,7 @@ Experimental operating system written in C++ for ARM64/AArch64 architecture.
   - Global interface registry (compositor, seat, output)
 
 ## Prerequisites
-- ARM64 bare-metal C++ toolchain (aarch64-none-elf-g++)
+- Clang/LLVM toolchain (clang-16 or later)
 - QEMU (qemu-system-aarch64)
 - GNU Make
 
@@ -37,20 +37,13 @@ Experimental operating system written in C++ for ARM64/AArch64 architecture.
 
 ### Install Dependencies
 
-1. Install ARM64 bare-metal toolchain:
+1. Install Clang/LLVM toolchain:
 ```bash
 # On Ubuntu/Debian
-sudo apt-get install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
-
-# Or download ARM's GNU toolchain:
-# https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
-# Look for aarch64-none-elf toolchain
+sudo apt-get install clang llvm
 
 # On macOS
-brew install --cask gcc-aarch64-embedded
-# Or
-brew tap osx-cross/arm
-brew install arm-gcc-bin
+brew install llvm
 ```
 
 2. Install QEMU:
@@ -70,8 +63,8 @@ Simply run the bootstrap script:
 ```
 
 This will:
-1. Build the kernel using Make and the ARM64 C++ cross-compiler
-2. Convert the ELF binary to raw binary format
+1. Build the kernel using Make and Clang (ARM64 cross-compilation)
+2. Convert the ELF binary to raw binary format with llvm-objcopy
 3. Launch QEMU with the kernel
 
 Press `Ctrl-A` then `X` to exit QEMU.
